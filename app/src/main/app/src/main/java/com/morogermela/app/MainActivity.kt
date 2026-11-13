@@ -13,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,8 +57,10 @@ private fun readPurchases(context: Context): List<PurchaseRecord> {
         if (!file.exists()) return emptyList()
 
         val array = JSONArray(file.readText())
+
         (0 until array.length()).map { i ->
             val item = array.getJSONObject(i)
+
             PurchaseRecord(
                 id = item.getLong("id"),
                 date = item.getString("date"),
@@ -82,6 +83,7 @@ private fun savePurchases(
     records: List<PurchaseRecord>
 ) {
     val array = JSONArray()
+
     records.forEach { record ->
         array.put(
             JSONObject().apply {
@@ -104,6 +106,7 @@ private fun savePurchases(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             MaterialTheme {
                 Dashboard()
@@ -115,10 +118,68 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Dashboard() {
     var selectedPage by remember { mutableStateOf<String?>(null) }
+    var selectedBird by remember { mutableStateOf<String?>(null) }
 
-    if (selectedPage == "ক্রয় হিসাব") {
-        PurchaseScreen { selectedPage = null }
+    if (selectedPage == "ক্রয় হিসাব" && selectedBird != null) {
+
+        PurchaseScreen(
+            fixedBird = selectedBird!!,
+            onBack = { selectedBird = null }
+        )
+
+    } else if (selectedPage == "ক্রয় হিসাব") {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Background)
+                .padding(16.dp)
+        ) {
+            Text(
+                "← ফিরে যান",
+                color = Green,
+                modifier = Modifier.clickable {
+                    selectedPage = null
+                }
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            Text(
+                "পাখি নির্বাচন করুন",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Green
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            listOf("মুরগি", "হাঁস", "কোয়েল", "কবুতর").forEach { bird ->
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .clickable {
+                            selectedBird = bird
+                        },
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    )
+                ) {
+                    Text(
+                        bird,
+                        modifier = Modifier.padding(22.dp),
+                        color = Green,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+
     } else if (selectedPage != null) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -128,16 +189,22 @@ fun Dashboard() {
             Text(
                 "← ফিরে যান",
                 color = Green,
-                modifier = Modifier.clickable { selectedPage = null }
+                modifier = Modifier.clickable {
+                    selectedPage = null
+                }
             )
+
             Spacer(Modifier.height(24.dp))
+
             Text(
                 selectedPage!!,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Green
             )
+
             Spacer(Modifier.height(20.dp))
+
             Card(modifier = Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
@@ -145,11 +212,16 @@ fun Dashboard() {
                         .padding(24.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("আপনি এখনো তথ্য যোগ করেননি", color = Color.Gray)
+                    Text(
+                        "আপনি এখনো তথ্য যোগ করেননি",
+                        color = Color.Gray
+                    )
                 }
             }
         }
+
     } else {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -162,37 +234,66 @@ fun Dashboard() {
                 fontWeight = FontWeight.Bold,
                 color = Green
             )
-            Text("পোল্ট্রি হিসাব ব্যবস্থাপনা", color = Color.Gray)
+
+            Text(
+                "পোল্ট্রি হিসাব ব্যবস্থাপনা",
+                color = Color.Gray
+            )
 
             Spacer(Modifier.height(22.dp))
-            Text("আজকের হিসাব", fontSize = 19.sp, fontWeight = FontWeight.Bold)
+
+            Text(
+                "আজকের হিসাব",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold
+            )
+
             Spacer(Modifier.height(12.dp))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 SummaryCard("মোট ক্রয়", "৳ ০", Modifier.weight(1f))
                 SummaryCard("মোট বিক্রয়", "৳ ০", Modifier.weight(1f))
                 SummaryCard("লাভ / ক্ষতি", "৳ ০", Modifier.weight(1f))
             }
 
             Spacer(Modifier.height(24.dp))
-            Text("হিসাব ব্যবস্থাপনা", fontSize = 19.sp, fontWeight = FontWeight.Bold)
+
+            Text(
+                "হিসাব ব্যবস্থাপনা",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold
+            )
+
             Spacer(Modifier.height(12.dp))
 
             val sections = listOf(
-                "ক্রয় হিসাব", "বিক্রয় হিসাব",
-                "অন্যান্য হিসাব", "স্টক",
-                "কর্মচারী", "রিপোর্ট"
+                "ক্রয় হিসাব",
+                "বিক্রয় হিসাব",
+                "অন্যান্য হিসাব",
+                "স্টক",
+                "কর্মচারী",
+                "রিপোর্ট"
             )
 
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 sections.chunked(2).forEach { pair ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
                         pair.forEach { section ->
+
                             Card(
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(105.dp)
-                                    .clickable { selectedPage = section },
+                                    .clickable {
+                                        selectedPage = section
+                                    },
                                 shape = RoundedCornerShape(16.dp),
                                 colors = CardDefaults.cardColors(
                                     containerColor = Color.White
@@ -212,7 +313,10 @@ fun Dashboard() {
                                 }
                             }
                         }
-                        if (pair.size == 1) Spacer(Modifier.weight(1f))
+
+                        if (pair.size == 1) {
+                            Spacer(Modifier.weight(1f))
+                        }
                     }
                 }
             }
@@ -221,21 +325,33 @@ fun Dashboard() {
 }
 
 @Composable
-fun PurchaseScreen(onBack: () -> Unit) {
+fun PurchaseScreen(
+    fixedBird: String,
+    onBack: () -> Unit
+) {
     val context = LocalContext.current
+
     val records = remember {
         mutableStateListOf<PurchaseRecord>().apply {
             addAll(readPurchases(context))
         }
     }
 
+    val visibleRecords = records.filter {
+        it.bird == fixedBird
+    }
+
     val today = remember {
-        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.getDefault()
+        ).format(Date())
     }
 
     var date by remember { mutableStateOf(today) }
-    var bird by remember { mutableStateOf("মুরগি") }
-    var breed by remember { mutableStateOf(breeds["মুরগি"]!!.first()) }
+    var breed by remember {
+        mutableStateOf(breeds[fixedBird]!!.first())
+    }
     var supplier by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf("") }
@@ -244,17 +360,20 @@ fun PurchaseScreen(onBack: () -> Unit) {
     var message by remember { mutableStateOf("") }
     var showMessage by remember { mutableStateOf(false) }
 
-    val isWeightBird = bird == "মুরগি" || bird == "হাঁস"
+    val isWeightBird = fixedBird == "মুরগি" || fixedBird == "হাঁস"
+
     val amount = (
-        (if (isWeightBird) weight.toDoubleOrNull() ?: 0.0
-         else quantity.toDoubleOrNull() ?: 0.0) *
+        (if (isWeightBird) {
+            weight.toDoubleOrNull() ?: 0.0
+        } else {
+            quantity.toDoubleOrNull() ?: 0.0
+        }) *
         (rate.toDoubleOrNull() ?: 0.0)
     )
 
     fun clearForm() {
         date = today
-        bird = "মুরগি"
-        breed = breeds["মুরগি"]!!.first()
+        breed = breeds[fixedBird]!!.first()
         supplier = ""
         quantity = ""
         weight = ""
@@ -272,51 +391,69 @@ fun PurchaseScreen(onBack: () -> Unit) {
         Text(
             "← ফিরে যান",
             color = Green,
-            modifier = Modifier.clickable { onBack() }
+            modifier = Modifier.clickable {
+                onBack()
+            }
         )
 
         Spacer(Modifier.height(16.dp))
+
         Text(
-            "ক্রয় হিসাব",
+            "$fixedBird ক্রয় হিসাব",
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             color = Green
         )
+
         Spacer(Modifier.height(16.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            )
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("নতুন ক্রয়ের তথ্য", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(
+                    "নতুন ক্রয়ের তথ্য",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+
+                Text(
+                    "পাখির ধরন: $fixedBird",
+                    color = Green,
+                    fontWeight = FontWeight.Bold
+                )
 
                 OutlinedTextField(
                     value = date,
                     onValueChange = { date = it },
-                    label = { Text("তারিখ (YYYY-MM-DD)") },
+                    label = {
+                        Text("তারিখ (YYYY-MM-DD)")
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
 
-                Text("পাখির ধরন")
-                SimpleDropdown(bird, breeds.keys.toList()) {
-                    bird = it
-                    breed = breeds[it]!!.first()
-                }
-
                 Text("জাত নির্বাচন")
-                SimpleDropdown(breed, breeds[bird]!!) {
+
+                SimpleDropdown(
+                    breed,
+                    breeds[fixedBird]!!
+                ) {
                     breed = it
                 }
 
                 OutlinedTextField(
                     value = supplier,
                     onValueChange = { supplier = it },
-                    label = { Text("সরবরাহকারীর নাম") },
+                    label = {
+                        Text("সরবরাহকারীর নাম")
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -324,9 +461,13 @@ fun PurchaseScreen(onBack: () -> Unit) {
                 OutlinedTextField(
                     value = quantity,
                     onValueChange = { quantity = it },
-                    label = { Text("পরিমাণ (টি)") },
+                    label = {
+                        Text("পরিমাণ (টি)")
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
                     singleLine = true
                 )
 
@@ -334,9 +475,13 @@ fun PurchaseScreen(onBack: () -> Unit) {
                     OutlinedTextField(
                         value = weight,
                         onValueChange = { weight = it },
-                        label = { Text("মোট ওজন (কেজি)") },
+                        label = {
+                            Text("মোট ওজন (কেজি)")
+                        },
                         modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Decimal
+                        ),
                         singleLine = true
                     )
                 }
@@ -345,15 +490,25 @@ fun PurchaseScreen(onBack: () -> Unit) {
                     value = rate,
                     onValueChange = { rate = it },
                     label = {
-                        Text(if (isWeightBird) "প্রতি কেজির দর (৳)" else "প্রতি পিসের দর (৳)")
+                        Text(
+                            if (isWeightBird) {
+                                "প্রতি কেজির দর (৳)"
+                            } else {
+                                "প্রতি পিসের দর (৳)"
+                            }
+                        )
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal
+                    ),
                     singleLine = true
                 )
 
                 Text(
-                    "মোট টাকা: ৳ ${"%.2f".format(Locale.US, amount)}",
+                    "মোট টাকা: ৳ ${
+                        "%.2f".format(Locale.US, amount)
+                    }",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Green
@@ -366,18 +521,24 @@ fun PurchaseScreen(onBack: () -> Unit) {
                         val w = weight.toDoubleOrNull() ?: 0.0
 
                         if (
-                            date.isBlank() || supplier.isBlank() ||
+                            date.isBlank() ||
+                            supplier.isBlank() ||
                             q == null || q <= 0 ||
                             r == null || r <= 0 ||
-                            (isWeightBird && (w <= 0 || weight.isBlank()))
+                            (
+                                isWeightBird &&
+                                (w <= 0 || weight.isBlank())
+                            )
                         ) {
                             message = "সব তথ্য সঠিকভাবে পূরণ করুন"
                             showMessage = true
                         } else {
+
                             val record = PurchaseRecord(
-                                id = editingId ?: System.currentTimeMillis(),
+                                id = editingId
+                                    ?: System.currentTimeMillis(),
                                 date = date.trim(),
-                                bird = bird,
+                                bird = fixedBird,
                                 breed = breed,
                                 supplier = supplier.trim(),
                                 quantity = q,
@@ -386,25 +547,43 @@ fun PurchaseScreen(onBack: () -> Unit) {
                                 amount = amount
                             )
 
-                            val oldIndex = records.indexOfFirst { it.id == record.id }
-                            if (oldIndex >= 0) records[oldIndex] = record
-                            else records.add(0, record)
+                            val oldIndex = records.indexOfFirst {
+                                it.id == record.id
+                            }
+
+                            if (oldIndex >= 0) {
+                                records[oldIndex] = record
+                            } else {
+                                records.add(0, record)
+                            }
 
                             savePurchases(context, records)
+
                             clearForm()
+
                             message = "ক্রয়ের তথ্য সংরক্ষণ হয়েছে"
                             showMessage = true
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Green)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Green
+                    )
                 ) {
-                    Text(if (editingId == null) "ক্রয়ের তথ্য সংরক্ষণ করুন" else "তথ্য আপডেট করুন")
+                    Text(
+                        if (editingId == null) {
+                            "ক্রয়ের তথ্য সংরক্ষণ করুন"
+                        } else {
+                            "তথ্য আপডেট করুন"
+                        }
+                    )
                 }
 
                 if (editingId != null) {
                     OutlinedButton(
-                        onClick = { clearForm() },
+                        onClick = {
+                            clearForm()
+                        },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("সম্পাদনা বাতিল")
@@ -414,31 +593,44 @@ fun PurchaseScreen(onBack: () -> Unit) {
         }
 
         Spacer(Modifier.height(20.dp))
+
         Text(
-            "ক্রয়ের তালিকা (${records.size})",
+            "ক্রয়ের তালিকা (${visibleRecords.size})",
             fontSize = 19.sp,
             fontWeight = FontWeight.Bold
         )
+
         Spacer(Modifier.height(10.dp))
 
-        if (records.isEmpty()) {
-            Card(modifier = Modifier.fillMaxWidth()) {
+        if (visibleRecords.isEmpty()) {
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(24.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("আপনি এখনো তথ্য যোগ করেননি", color = Color.Gray)
+                    Text(
+                        "আপনি এখনো তথ্য যোগ করেননি",
+                        color = Color.Gray
+                    )
                 }
             }
+
         } else {
-            records.forEach { record ->
+
+            visibleRecords.forEach { record ->
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 10.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    )
                 ) {
                     Column(
                         modifier = Modifier.padding(14.dp),
@@ -449,40 +641,68 @@ fun PurchaseScreen(onBack: () -> Unit) {
                             fontWeight = FontWeight.Bold,
                             color = Green
                         )
+
                         Text("তারিখ: ${record.date}")
                         Text("সরবরাহকারী: ${record.supplier}")
                         Text("পরিমাণ: ${record.quantity} টি")
-                        if (record.weight > 0) Text("ওজন: ${record.weight} কেজি")
+
+                        if (record.weight > 0) {
+                            Text("ওজন: ${record.weight} কেজি")
+                        }
+
                         Text("দর: ৳ ${record.rate}")
+
                         Text(
-                            "মোট: ৳ ${"%.2f".format(Locale.US, record.amount)}",
+                            "মোট: ৳ ${
+                                "%.2f".format(
+                                    Locale.US,
+                                    record.amount
+                                )
+                            }",
                             fontWeight = FontWeight.Bold
                         )
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             TextButton(
                                 onClick = {
                                     editingId = record.id
                                     date = record.date
-                                    bird = record.bird
                                     breed = record.breed
                                     supplier = record.supplier
                                     quantity = record.quantity.toString()
-                                    weight = if (record.weight > 0) record.weight.toString() else ""
+                                    weight = if (record.weight > 0) {
+                                        record.weight.toString()
+                                    } else {
+                                        ""
+                                    }
                                     rate = record.rate.toString()
                                 }
                             ) {
-                                Text("সম্পাদনা", color = Green)
+                                Text(
+                                    "সম্পাদনা",
+                                    color = Green
+                                )
                             }
 
                             TextButton(
                                 onClick = {
-                                    records.removeAll { it.id == record.id }
+                                    records.removeAll {
+                                        it.id == record.id
+                                    }
+
                                     savePurchases(context, records)
-                                    if (editingId == record.id) clearForm()
+
+                                    if (editingId == record.id) {
+                                        clearForm()
+                                    }
                                 }
                             ) {
-                                Text("মুছে ফেলুন", color = Color.Red)
+                                Text(
+                                    "মুছে ফেলুন",
+                                    color = Color.Red
+                                )
                             }
                         }
                     }
@@ -492,13 +712,21 @@ fun PurchaseScreen(onBack: () -> Unit) {
 
         if (showMessage) {
             AlertDialog(
-                onDismissRequest = { showMessage = false },
+                onDismissRequest = {
+                    showMessage = false
+                },
                 confirmButton = {
-                    TextButton(onClick = { showMessage = false }) {
+                    TextButton(
+                        onClick = {
+                            showMessage = false
+                        }
+                    ) {
                         Text("ঠিক আছে")
                     }
                 },
-                text = { Text(message) }
+                text = {
+                    Text(message)
+                }
             )
         }
     }
@@ -510,11 +738,17 @@ fun SimpleDropdown(
     options: List<String>,
     onSelect: (String) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember {
+        mutableStateOf(false)
+    }
 
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+    ) {
         OutlinedButton(
-            onClick = { expanded = true },
+            onClick = {
+                expanded = true
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(selected)
@@ -522,11 +756,16 @@ fun SimpleDropdown(
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = {
+                expanded = false
+            }
         ) {
             options.forEach { option ->
+
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = {
+                        Text(option)
+                    },
                     onClick = {
                         onSelect(option)
                         expanded = false
@@ -546,7 +785,9 @@ fun SummaryCard(
     Card(
         modifier = modifier.height(95.dp),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = LightGreen)
+        colors = CardDefaults.cardColors(
+            containerColor = LightGreen
+        )
     ) {
         Column(
             modifier = Modifier
@@ -555,8 +796,14 @@ fun SummaryCard(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(title, fontSize = 12.sp, color = Green)
+            Text(
+                title,
+                fontSize = 12.sp,
+                color = Green
+            )
+
             Spacer(Modifier.height(8.dp))
+
             Text(
                 amount,
                 fontSize = 17.sp,
