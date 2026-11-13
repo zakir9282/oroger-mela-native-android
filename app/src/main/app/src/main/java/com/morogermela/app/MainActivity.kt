@@ -21,10 +21,12 @@ import androidx.compose.ui.unit.sp
 
 private val Green = Color(0xFF176B45)
 private val LightGreen = Color(0xFFEAF5EE)
+private val Background = Color(0xFFF5F8F5)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             MaterialTheme {
                 Dashboard()
@@ -41,7 +43,7 @@ fun Dashboard() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F8F5))
+                .background(Background)
                 .padding(20.dp)
         ) {
             Text(
@@ -62,107 +64,114 @@ fun Dashboard() {
                 color = Green
             )
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, RoundedCornerShape(16.dp))
-                    .padding(24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "আপনি এখনো তথ্য যোগ করেননি",
-                    color = Color.Gray
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
                 )
-            }
-        }
-        return
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F8F5))
-            .padding(16.dp)
-    ) {
-        Text(
-            "মোরগের মেলা",
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-            color = Green
-        )
-
-        Text(
-            "পোল্ট্রি হিসাব ব্যবস্থাপনা",
-            color = Color.Gray,
-            fontSize = 14.sp
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            "আজকের হিসাব",
-            fontSize = 19.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SummaryCard("মোট ক্রয়", "৳ ০", Modifier.weight(1f))
-            SummaryCard("মোট বিক্রয়", "৳ ০", Modifier.weight(1f))
-            SummaryCard("লাভ / ক্ষতি", "৳ ০", Modifier.weight(1f))
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            "হিসাব ব্যবস্থাপনা",
-            fontSize = 19.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        val sections = listOf(
-            "ক্রয় হিসাব",
-            "বিক্রয় হিসাব",
-            "অন্যান্য হিসাব",
-            "স্টক",
-            "কর্মচারী",
-            "রিপোর্ট"
-        )
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(sections) { section ->
-                Card(
+            ) {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(105.dp)
-                        .clickable { selectedPage = section },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    elevation = CardDefaults.cardElevation(2.dp)
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
+                    Text(
+                        "আপনি এখনো তথ্য যোগ করেননি",
+                        color = Color.Gray
+                    )
+                }
+            }
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Background)
+                .padding(16.dp)
+        ) {
+            Text(
+                "মোরগের মেলা",
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold,
+                color = Green
+            )
+
+            Text(
+                "পোল্ট্রি হিসাব ব্যবস্থাপনা",
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
+
+            Spacer(modifier = Modifier.height(22.dp))
+
+            Text(
+                "আজকের হিসাব",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                SummaryCard("মোট ক্রয়", "৳ ০", Modifier.weight(1f))
+                SummaryCard("মোট বিক্রয়", "৳ ০", Modifier.weight(1f))
+                SummaryCard("লাভ / ক্ষতি", "৳ ০", Modifier.weight(1f))
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                "হিসাব ব্যবস্থাপনা",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            val sections = listOf(
+                "ক্রয় হিসাব",
+                "বিক্রয় হিসাব",
+                "অন্যান্য হিসাব",
+                "স্টক",
+                "কর্মচারী",
+                "রিপোর্ট"
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(sections) { section ->
+                    Card(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(14.dp),
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .height(105.dp)
+                            .clickable {
+                                selectedPage = section
+                            },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        ),
+                        elevation = CardDefaults.cardElevation(2.dp)
                     ) {
-                        Text(
-                            section,
-                            color = Green,
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                section,
+                                color = Green,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
@@ -190,8 +199,14 @@ fun SummaryCard(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(title, fontSize = 12.sp, color = Green)
+            Text(
+                title,
+                fontSize = 12.sp,
+                color = Green
+            )
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 amount,
                 fontSize = 17.sp,
