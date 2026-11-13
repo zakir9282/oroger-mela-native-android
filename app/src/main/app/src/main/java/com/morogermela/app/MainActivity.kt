@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,14 +13,16 @@ import androidx.compose.ui.unit.sp
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             MaterialTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxSize().padding(20.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
                             text = "মোরগের মেলা",
                             fontSize = 28.sp
                         )
+
                         Text(
                             text = "পোল্ট্রি হিসাব ব্যবস্থাপনা",
                             modifier = Modifier.padding(top = 8.dp)
